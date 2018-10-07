@@ -3,7 +3,10 @@
 #include <functional>
 #include <algorithm>
 #include <vector>
+#include <tuple>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 class Process
 {
@@ -22,6 +25,12 @@ private:
 
 	Functors m_functors;
 	Params m_params;
+
+	// these two functions unpack parameters into a function (like *args in Python)
+	template<typename F, typename Tuple, size_t ...S >
+	decltype(auto) apply_tuple_impl(F&& fn, Tuple&& t, std::index_sequence<S...>);
+	template<typename F, typename Tuple>
+	decltype(auto) apply_from_tuple(F&& fn, Tuple&& t);
 public:
 
 	Process() {};

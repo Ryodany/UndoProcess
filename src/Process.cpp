@@ -2,6 +2,23 @@
 
 #include "Process.h"
 
+// these two functions unpack parameters into a function (like *args in Python)
+template<typename F, typename Tuple>
+decltype(auto) Process::apply_from_tuple(F&& fn, Tuple&& t)
+{
+	std::size_t constexpr tSize
+		= std::tuple_size<typename std::remove_reference<Tuple>::type>::value;
+	return apply_tuple_impl(std::forward<F>(fn),
+		std::forward<Tuple>(t),
+		std::make_index_sequence<tSize>());
+}
+
+template<typename F, typename Tuple, size_t ...S >
+decltype(auto) Process::apply_tuple_impl(F&& fn, Tuple&& t, std::index_sequence<S...>)
+{
+	return std::forward<F>(fn)(std::get<S>(std::forward<Tuple>(t))...);
+}
+
 void Process::process1(std::string &&installationDir)
 {
 	ProcessData processData = { installationDir };
